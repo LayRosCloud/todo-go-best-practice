@@ -5,6 +5,8 @@ import (
 	"net/http"
 )
 
+const TotalCountHeader = "X-Total-Count"
+
 func HandleError(err error, w http.ResponseWriter) {
 	if err == nil {
 		return

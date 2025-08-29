@@ -20,14 +20,14 @@ type Database struct {
 
 func (d *Database) ToConnectionString(cfg *config.Config) string {
 	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
-		cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.DBName, cfg.SSLMode)
+		cfg.Host, cfg.PortDb, cfg.User, cfg.Password, cfg.DBName, cfg.SSLMode)
 
 	return connStr
 }
 
 func NewPostgresConnection(cfg *config.Config) (*Database, error) {
 	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
-		cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.DBName, cfg.SSLMode)
+		cfg.Host, cfg.PortDb, cfg.User, cfg.Password, cfg.DBName, cfg.SSLMode)
 
 	return NewPostgresConnectionString(connStr)
 }
@@ -53,7 +53,6 @@ func NewPostgresConnectionString(connection string) (*Database, error) {
 func (d *Database) RunMigrations(conf *config.Config) error {
 	log.Println("Running migrations with temporary connection...")
     
-    // Создаем временное соединение только для миграций
     tempDB, err := sqlx.Connect("postgres", d.ToConnectionString(conf))
     if err != nil {
         return fmt.Errorf("failed to create temporary database connection: %w", err)
@@ -66,7 +65,7 @@ func (d *Database) RunMigrations(conf *config.Config) error {
     }
 
     m, err := migrate.NewWithDatabaseInstance(
-        "file://../../migrations",
+        fmt.Sprintf("file://%s", conf.MigrationPath),
         "postgres", 
         driver,
     )

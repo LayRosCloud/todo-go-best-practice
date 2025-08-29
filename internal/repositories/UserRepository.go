@@ -17,6 +17,7 @@ type UserRepositoryInterface interface {
 	Create(ctx context.Context, user *models.User) (error)
 	Update(ctx context.Context, user *models.User) (error)
 	DeleteById(ctx context.Context, id int64) (error)
+	FindByLogin(ctx context.Context, login string) (*models.User, error)
 }
 
 type UserRepository struct {
@@ -71,10 +72,20 @@ func (r *UserRepository) FindById(ctx context.Context, id int64) (*models.User, 
 	return &user, nil
 }
 
+func (r *UserRepository) FindByLogin(ctx context.Context, login string) (*models.User, error) {
+	var user models.User
+	query := "SELECT u.* FROM users u WHERE login=$1";
+	err := r.db.GetContext(ctx, &user, query, login)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
 func (r *UserRepository) Create(ctx context.Context, user *models.User) error {
 	user.CreatedAt = time.Now().UTC()
-	query := "INSERT INTO users (login, password, created_at) VALUES (:login, :password, :created_at) RETURNING id";
-	return r.db.GetContext(ctx, user, query, user)
+	query := "INSERT INTO users (login, password, created_at) VALUES ($1, $2, $3) RETURNING id";
+	return r.db.GetContext(ctx, user, query, user.Login, user.Password, user.CreatedAt)
 }
 
 func (r *UserRepository) Update(ctx context.Context, user *models.User) (error) {

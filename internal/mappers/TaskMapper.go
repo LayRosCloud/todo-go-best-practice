@@ -16,6 +16,7 @@ func (m *TaskMapper) MapToFull(task *models.Task) (*dto.TaskResponse) {
 		CreatedAt: task.CreatedAt,
 		UpdatedAt: task.UpdatedAt,
 		UserId: task.UserId,
+		FinishedAt: task.FinishedAt,
 	}
 }
 
@@ -27,6 +28,11 @@ func (m *TaskMapper) MapToFullList(tasks []models.Task) ([]dto.TaskResponse) {
 	return responses
 }
 
+func (m *TaskMapper) AssignUpdateAndEntity(task *models.Task, dto *dto.TaskUpdateRequest) {
+	task.Name = dto.Name
+	task.Description = dto.Description
+	task.FinishedAt = dto.FinishedAt
+}
 
 func (m *TaskMapper) MapToEntity(dto *dto.TaskCreateRequest) (*models.Task) {
 	return &models.Task{

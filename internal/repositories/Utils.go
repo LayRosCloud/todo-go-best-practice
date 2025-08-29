@@ -18,6 +18,10 @@ func CreateTaskRepository(db *sqlx.DB) *TaskRepository {
 	return &TaskRepository{db: db}
 }
 
+func CreateTokenRepository(db *sqlx.DB) *TokenRepository {
+	return &TokenRepository{db: db}
+}
+
 func CreateUserRepository(db *sqlx.DB, taskRepository TaskRepositoryInterface) *UserRepository {
 	return &UserRepository{db: db, TaskRepository: taskRepository}
 }

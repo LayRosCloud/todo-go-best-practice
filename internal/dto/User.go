@@ -6,7 +6,6 @@ type UserShortResponse struct {
 	Id        int64          `json:"id"`
 	Login     string         `json:"login"`
 	CreatedAt time.Time      `json:"createdAt"`
-	Tasks     []TaskResponse `json:"tasks"`
 }
 
 type UserFullResponse struct {
@@ -17,20 +16,20 @@ type UserFullResponse struct {
 }
 
 type UserCreateRequest struct {
-	Login    string `json:"login" validate:"required,min=3"`
-	Password string `json:"password" validate:"required,min=8"`
+	Login    string `json:"login" validate:"required,min=3,max=30"`
+	Password string `json:"password" validate:"required,min=8,max=30"`
 }
 
 type UserUpdateRequest struct {
 	Id       int64  `json:"id" validate:"required,min=0"`
-	Login    string `json:"login" validate:"required,min=3"`
+	Login    string `json:"login" validate:"required,min=3,max=30"`
 }
 
 type UserUpdatePasswordRequest struct {
 	Id       int64  `json:"id" validate:"required,min=0"`
-	OldPassword    string `json:"oldPassword" validate:"required,min=8"`
-	NewPassword    string `json:"newPassword" validate:"required,min=8"`
-	RepeatPassword    string `json:"repeatPassword" validate:"required,min=8"`
+	OldPassword    string `json:"oldPassword" validate:"required,min=8,max=30"`
+	NewPassword    string `json:"newPassword" validate:"required,min=8,max=30"`
+	RepeatPassword    string `json:"repeatPassword" validate:"required,min=8,max=30"`
 }
 
 type UserFindByIdRequest struct {
@@ -45,5 +44,10 @@ type UserFindAllRequest struct {
 }
 
 type UserDeleteByIdRequest struct {
-	Id int64 `query:"id"`
+	Id int64 `query:"id" validate:"required,min=0"`
+}
+
+type AuthorizationRequest struct {
+	Login string `json:"login" validate:"required,min=3,max=30"`
+	Password string `json:"password" validate:"required,min=8,max=30"`
 }

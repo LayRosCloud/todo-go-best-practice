@@ -49,8 +49,8 @@ func (r *TaskRepository) FindById(ctx context.Context, id int64) (*models.Task, 
 
 func (r *TaskRepository) Create(ctx context.Context, task *models.Task) (error) {
 	task.CreatedAt = time.Now().UTC()
-	query := "INSERT INTO tasks (name, description, created_at, user_id) VALUES (:name, :description, :created_at, :user_id)";
-	return r.db.GetContext(ctx, task, query, task)
+	query := "INSERT INTO tasks (name, description, created_at, user_id) VALUES ($1, $2, $3, $4)";
+	return r.db.GetContext(ctx, task, query, task.Name, task.Description, task.CreatedAt, task.UserId)
 }
 
 func (r *TaskRepository) Update(ctx context.Context, task *models.Task) (error) {

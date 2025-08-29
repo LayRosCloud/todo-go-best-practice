@@ -1,0 +1,51 @@
+services:
+  database:
+    image: postgres:16.2
+    container_name: todo_base
+    environment:
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=todo_base
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -u admin -d todo_base"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 4s
+    volumes:
+      - postgres_data:/var/lib/postgres/data
+    networks:
+      - app_network
+  golang:
+    container_name: todo_app
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - PORT_DB=5432
+      - HOST_DB=database
+      - USER_DB=admin
+      - PASSWORD_DB=admin
+      - NAME_DB=todo_base
+      - SSLMODE_DB=disable
+      - ACCESS_SECRET=super-secret-256-bit-key-example!
+      - REFRESH_SECRET=even-more-secure-key-with-more-than-32-bytes!
+      - MIGRATION_PATH=//app/migrations
+    ports:
+      - 8080:8080
+    depends_on:
+      - database
+    networks:
+      - app_network
+
+volumes:
+  postgres_data:
+
+networks:
+  app_network:
+    driver: bridge
+
+  
+  

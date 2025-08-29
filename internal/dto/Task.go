@@ -9,21 +9,24 @@ type TaskResponse struct {
 	CreatedAt   time.Time  `json:"createdAt"`
 	UpdatedAt   time.Time  `json:"updatedAt"`
 	UserId      int64  `json:"userId"`
+	FinishedAt  time.Time `json:"finishedAt"`
 }
 
 type TaskCreateRequest struct {
-	Name        string `json:"name" validate:"required,min=3"`
-	Description string `json:"description" validate:"required,min=10"`
+	Name        string `json:"name" validate:"required,min=3,max=30"`
+	Description string `json:"description" validate:"required,min=10,max=255"`
 	UserId      int64  `json:"userId" validate:"required,min=0"`
 }
 
 type TaskUpdateRequest struct {
 	Id          int64  `json:"id" validate:"min=0"`
-	Name        string `json:"name" validate:"required,min=3"`
-	Description string `json:"description" validate:"required,min=10"`
+	Name        string `json:"name" validate:"required,min=3,max=30"`
+	Description string `json:"description" validate:"required,min=10,max=255"`
+	FinishedAt  time.Time `json:"finishedAt"`
 }
 
 type TaskFindAllRequest struct {
+	UserId int64 `query:"userId" validate:"required,min=0"`
 	Limit int `query:"limit" validate:"required,min=0,max=100"`
 	Page  int `query:"page" validate:"required,min=1"`
 }

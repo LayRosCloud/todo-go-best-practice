@@ -11,58 +11,66 @@ import (
 	databases "leafall/todo-service/pkg/database"
 	"log"
 	"net/http"
+	"time"
+
+	"github.com/go-chi/chi/v5"
 )
 
 func main() {
 	const Port = 8080
+	db, config := LoadDatabaseAndConfig()
+	defer db.Close()
+	router := ConfigureRouter(db, config)
 	
-	// Загрузка конфигурации
+	ListenAndServe(router, Port, *db)
+}
+
+func LoadDatabaseAndConfig() (*databases.Database, *config.Config) {
 	config, err := config.LoadConfig()
 	if err != nil {
 		log.Fatalf("Error with config: %v", err)
 	}
 
-	// Подключение к БД
 	db, err := databases.NewPostgresConnection(config)
 	if err != nil {
 		log.Fatalf("Error with database: %v", err)
 	}
 	
-	// Гарантированное закрытие соединения
-	defer func() {
-		if err := db.Close(); err != nil {
-			log.Printf("Error closing database: %v", err)
-		}
-	}()
-
-	// Миграции
 	if err = db.RunMigrations(config); err != nil {
 		log.Fatalf("Error with migrations: %v", err)
-		return
 	}
+	return db, config
+}
 
-	// Инициализация зависимостей
+func ConfigureRouter(db *databases.Database, config *config.Config) *chi.Mux {
 	taskMapper := mappers.TaskMapper{}
-	userMapper := mappers.UserMapper{TaskMapper: taskMapper}
+	userMapper := mappers.NewUserMapper(&taskMapper)
 
-	// Убедитесь, что репозитории получают актуальное соединение
 	taskRepo := repositories.CreateTaskRepository(db.DB)
+	tokenRepo := repositories.CreateTokenRepository(db.DB)
 	userRepo := repositories.CreateUserRepository(db.DB, taskRepo)
 
-	userService := services.NewUserService(userRepo, userMapper)
-	userHandler := handlers.NewUserHandler(*userService)
+	accessTokenService := services.NewTokenService(config.AccessSecret, time.Minute * 15)
+	refreshTokenService := services.NewTokenService(config.RefreshSecret, time.Hour * 24 * 30)
+	userService := services.NewUserService(userRepo, userMapper, accessTokenService, refreshTokenService, tokenRepo)
+	taskService := services.NewTaskService(taskRepo, taskMapper)
 
-	paramsApi := api.NewApiSetup(userHandler)
+	userHandler := handlers.NewUserHandler(userService)
+	taskHandler := handlers.NewTaskHandler(taskService)
+
+	paramsApi := api.NewApiSetup(userHandler, taskHandler, userService)
 	router := api.SetupRoutes(paramsApi)
+	return router
+}
 
-	// Запуск сервера
-	log.Printf("Server starting on port: %d\n", Port)
+func ListenAndServe(router *chi.Mux, port int, db databases.Database) {
+	log.Printf("Server starting on port: %d\n", port)
 	if err := db.DB.Ping(); err != nil {
     	log.Fatalf("Database connection is dead before server start: %v", err)
 	}
 
 	log.Printf("Database connection is alive: %v", db.DB.Stats())
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", Port), router); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", port), router); err != nil {
 		log.Fatalf("Server failed to start: %v", err)
 	}
 }

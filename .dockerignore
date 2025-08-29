@@ -1,0 +1,9 @@
+.git
+.gitignore
+Dockerfile
+.dockerignore
+**/*.log
+**/tmp/
+**/node_modules/
+**/.env
+**/.DS_Store

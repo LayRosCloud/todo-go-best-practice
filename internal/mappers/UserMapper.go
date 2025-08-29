@@ -6,7 +6,11 @@ import (
 )
 
 type UserMapper struct {
-	TaskMapper TaskMapper
+	TaskMapper *TaskMapper
+}
+
+func NewUserMapper(taskMapper *TaskMapper) *UserMapper {
+	return &UserMapper{TaskMapper: taskMapper}
 }
 
 func (m *UserMapper) MapToFull(user *models.User) (*dto.UserFullResponse) {

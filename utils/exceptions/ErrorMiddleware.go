@@ -28,6 +28,9 @@ type InternalServerError struct {
     Message   string
 }
 
+func (e *ErrorResponse) Error() string {
+    return e.Message
+}
 
 func (e *NotFoundError) Error() string {
     return fmt.Sprintf("%s not found: %v", e.Resource, e.ID)
@@ -42,6 +45,10 @@ func (e *BadRequestError) Error() string {
         return fmt.Sprintf("invalid field %s: %s", e.Field, e.Message)
     }
     return e.Message
+}
+
+func NewErrorResponse(statusCode int, message, details string) ErrorResponse {
+    return ErrorResponse{Status: statusCode, Message: message, Details: details}
 }
 
 func NewNotFound(resource, details string, id interface{}) error {
