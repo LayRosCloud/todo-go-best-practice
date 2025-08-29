@@ -1,12 +1,14 @@
 package api
 
 import (
+	_ "leafall/todo-service/docs"
 	"leafall/todo-service/internal/api/routes"
 	"leafall/todo-service/internal/handlers"
 	"leafall/todo-service/internal/middleware"
 	"leafall/todo-service/internal/services"
 
 	"github.com/go-chi/chi/v5"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 type ApiSetup struct {
@@ -37,6 +39,9 @@ func SetupRoutes(setup *ApiSetup) *chi.Mux {
 
 	router.Group(func(r chi.Router) {
 		routes.RegisterPublicUsers(setup.UserHandler, r)
+		r.Get("/swagger/*", httpSwagger.Handler(
+        	httpSwagger.URL("http://localhost:8080/swagger/doc.json"),
+    	))
 	})
 	
 	return router

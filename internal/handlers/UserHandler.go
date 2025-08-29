@@ -21,6 +21,19 @@ func NewUserHandler(service *services.UserService) *UserHandler {
 	return &UserHandler{Service: service}
 }
 
+// GetUsers godoc
+// @Summary Get all users
+// @Description Get all users from the database with pagination
+// @Tags users
+// @Accept  json
+// @Produce  json
+// @Param limit query int false "Limit number of users" default(10) minimum(1) maximum(100)
+// @Param page query int false "Page number" default(1) minimum(1)
+// @Success 200 {array} dto.UserShortResponse
+// @Failure 400 {object} exceptions.ErrorResponse
+// @Failure 401 {object} exceptions.ErrorResponse
+// @Security BearerAuth
+// @Router /v1/users [get]
 func (u *UserHandler) FindAllPagination(w http.ResponseWriter, r *http.Request) {
 	limit := query.GetQueryInt(r, "limit", 10)
 	page := query.GetQueryInt(r, "page", 1)
@@ -34,6 +47,20 @@ func (u *UserHandler) FindAllPagination(w http.ResponseWriter, r *http.Request) 
 	json.NewEncoder(w).Encode(users)
 }
 
+// FindById godoc
+// @Summary Get by id
+// @Description Get by id user from the database with pagination on tasks
+// @Tags users
+// @Accept  json
+// @Produce  json
+// @Param limit query int false "Limit number of tasks" default(10) minimum(1) maximum(100)
+// @Param page query int false "Page number" default(1) minimum(1)
+// @Param id path int true "User id" minimum(0)
+// @Success 200 {object} dto.UserFullResponse
+// @Failure 400 {object} exceptions.ErrorResponse
+// @Failure 401 {object} exceptions.ErrorResponse
+// @Security BearerAuth
+// @Router /v1/users/{id} [get]
 func (u *UserHandler) FindById(w http.ResponseWriter, r *http.Request) {
 	limit := query.GetQueryInt(r, "limit", 10)
 	page := query.GetQueryInt(r, "page", 1)
@@ -54,6 +81,17 @@ func (u *UserHandler) FindById(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user)
 }
 
+// Create godoc
+// @Summary Create user
+// @Description Create user from the database with pagination on tasks
+// @Tags users
+// @Accept  json
+// @Produce  json
+// @Param user body dto.UserCreateRequest false "Body of request"
+// @Success 200 {object} dto.UserShortResponse
+// @Failure 400 {object} exceptions.ErrorResponse
+// @Failure 401 {object} exceptions.ErrorResponse
+// @Router /v1/users [post]
 func (u *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var dto dto.UserCreateRequest
 	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {

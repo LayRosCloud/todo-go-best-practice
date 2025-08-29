@@ -2,22 +2,33 @@ package dto
 
 import "time"
 
+// UserShortResponse DTO для получения только данных о пользователе
 type UserShortResponse struct {
-	Id        int64          `json:"id"`
-	Login     string         `json:"login"`
-	CreatedAt time.Time      `json:"createdAt"`
+	// Id идентификатор пользователя
+	Id        int64          `json:"id" example:"1"`
+	// Login логин пользователя
+	Login     string         `json:"login" example:"my_login"`
+	// CreatedAt дата создания пользователя
+	CreatedAt time.Time      `json:"createdAt" example:"2010-10-10"`
 }
 
+// UserFullResponse DTO для получения данных о пользователе и его задачах
 type UserFullResponse struct {
-	Id        int64          `json:"id"`
-	Login     string         `json:"login"`
-	CreatedAt time.Time      `json:"createdAt"`
+	// Id идентификатор пользователя
+	Id        int64          `json:"id" example:"1"`
+	// Login логин пользователя
+	Login     string         `json:"login" example:"my_login"`
+	// CreatedAt дата создания пользователя
+	CreatedAt time.Time      `json:"createdAt" example:"2010-10-10"`
+	// Tasks все задачи пользователя
 	Tasks     []TaskResponse `json:"tasks"`
 }
-
+// UserCreateRequest DTO для регистрации пользователя
 type UserCreateRequest struct {
-	Login    string `json:"login" validate:"required,min=3,max=30"`
-	Password string `json:"password" validate:"required,min=8,max=30"`
+	// Login логин пользователя (обязательное поле)
+	Login    string `json:"login" example:"my_login" validate:"required,min=3,max=30"`
+	// Password пароль пользователя (обязательное поле)
+	Password string `json:"password" example:"12345678" validate:"required,min=8,max=30"`
 }
 
 type UserUpdateRequest struct {
