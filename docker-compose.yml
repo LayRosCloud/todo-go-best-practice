@@ -8,6 +8,7 @@ services:
       - POSTGRES_DB=todo_base
     ports:
       - 5432:5432
+    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -u admin -d todo_base"]
       interval: 5s
@@ -20,6 +21,7 @@ services:
       - app_network
   golang:
     container_name: todo_app
+    restart: unless-stopped
     build: 
       context: .
       dockerfile: Dockerfile
