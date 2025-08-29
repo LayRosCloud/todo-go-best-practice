@@ -16,6 +16,15 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+// @title Todo api
+// @version 1.0
+// @description todo api for example.
+// @host 0.0.0.0:8080
+// @BasePath /
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
 func main() {
 	const Port = 8080
 	db, config := LoadDatabaseAndConfig()
